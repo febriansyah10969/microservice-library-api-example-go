@@ -2,10 +2,10 @@ package app
 
 import "gitlab.com/p9359/backend-prob/febry-go/internal/service"
 
-type ReviewApp struct {
-	service.ReviewService
+type BookApp struct {
+	service.GeneralService
 }
 
-func NewReviewApp(service service.ReviewService) *ReviewApp {
-	return &ReviewApp{service}
+func NewBookApp(service service.GeneralService) *BookApp {
+	return &BookApp{service}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine, app app.ReviewApp) {
+func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 	// keyWebPosOnline := os.Getenv("JWT_SECRET_ONLINE")
 	// keyWebDashboard := os.Getenv("JWT_SECRET")
 	// jwt_key_web_online := []byte(keyWebPosOnline)
@@ -14,7 +14,7 @@ func RegisterRoutes(r *gin.Engine, app app.ReviewApp) {
 	// authService := middleware.NewJWTService(jwt_key_web_online, jwt_key_dashboard_online)
 
 	// r.Use(middleware.CORSMiddleware())
-	api := r.Group("penguin/v1")
+	api := r.Group("api/v1")
 	{
 		api.Use()
 		{

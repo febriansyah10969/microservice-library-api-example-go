@@ -33,8 +33,8 @@ func main() {
 	}
 
 	repository := repository.NewDAO(nil, sqlx)
-	service := service.NewReviewService(repository)
-	app := app.NewReviewApp(service)
+	service := service.NewGeneralService(repository)
+	app := app.NewBookApp(service)
 
 	router := gin.Default()
 

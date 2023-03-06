@@ -6,10 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type ReviewRepository interface {
+type GeneralRepository interface {
 }
 
-type reviewRepository struct {
+type generalRepository struct {
 	SQL  *sql.DB
 	Sqlx *sqlx.DB
 }
