@@ -2,13 +2,13 @@ package service
 
 import "gitlab.com/p9359/backend-prob/febry-go/internal/repository"
 
-type GeneralService interface {
+type BookService interface {
 }
 
-type generalService struct {
+type bookService struct {
 	dao repository.DAO
 }
 
-func NewGeneralService(dao repository.DAO) GeneralService {
-	return &generalService{dao}
+func NewBookService(dao repository.DAO) BookService {
+	return &bookService{dao}
 }

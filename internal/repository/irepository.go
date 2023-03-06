@@ -6,10 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type GeneralRepository interface {
+type BookRepository interface {
 }
 
-type generalRepository struct {
+type bookRepository struct {
 	SQL  *sql.DB
 	Sqlx *sqlx.DB
 }

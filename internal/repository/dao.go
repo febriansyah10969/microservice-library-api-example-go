@@ -13,7 +13,7 @@ import (
 )
 
 type DAO interface {
-	NewGeneralRepository() GeneralRepository
+	NewGeneralRepository() BookRepository
 }
 
 type dao struct {
@@ -68,6 +68,6 @@ func NewSQLDB() (*sqlx.DB, error) {
 	return DB, nil
 }
 
-func (d *dao) NewGeneralRepository() GeneralRepository {
-	return &generalRepository{d.sql, d.sqlx}
+func (d *dao) NewGeneralRepository() BookRepository {
+	return &bookRepository{d.sql, d.sqlx}
 }
