@@ -10,7 +10,7 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine, app app.BookApp) {
-	keyWebPosOnline := os.Getenv("JWT_SECRET_ONLINE")
+	keyWebPosOnline := os.Getenv("JWT_SECRET")
 	jwt_key_web_online := []byte(keyWebPosOnline)
 	authService := middleware.NewJWTService(jwt_key_web_online)
 
