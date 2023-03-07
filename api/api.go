@@ -20,6 +20,7 @@ func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 		api.Use(middleware.AuthHandler(authService))
 		{
 			api.GET("/book", app.GetListBook)
+			api.POST("/book", app.CreateBook)
 		}
 	}
 }
