@@ -4,8 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
+
+func (bs *bookService) GetBooks(c *gin.Context, fillter *helper.Filter, paginate *helper.InPage) ([]model.Book, *helper.Pagination, error) {
+	dao := bs.dao.NewGeneralRepository()
+	result, pag, err := dao.GetBooks(c, fillter, paginate)
+	if err != nil {
+		return result, pag, err
+	}
+
+	return result, pag, nil
+}
 
 func (bs *bookService) CreateBook(c *gin.Context, rev dto.BookRequest) ([]string, error) {
 	repo := bs.dao.NewGeneralRepository()
