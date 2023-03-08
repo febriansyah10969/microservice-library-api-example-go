@@ -16,7 +16,7 @@ func (bs *bookService) CreateBook(c *gin.Context, rev dto.BookRequest) ([]string
 	bookData.AuthorID = int(rev.AuthorID)
 	bookData.Name = rev.Name
 	bookData.Price = int(rev.Price)
-	bookData.Stock = int(rev.Stock)
+	bookData.Stock = int(0)
 
 	err := repo.CreateBook(*bookData)
 	if err != nil {
