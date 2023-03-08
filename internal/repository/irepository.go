@@ -14,6 +14,7 @@ type BookRepository interface {
 	GetBooks(c *gin.Context, f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error)
 	CreateBook(bm model.Book) error
 	UpdateBook(uuid dto.GetUUID, bm model.Book) error
+	DeleteBook(uuid dto.GetUUID) error
 }
 
 type bookRepository struct {
