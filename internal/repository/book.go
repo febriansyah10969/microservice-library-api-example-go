@@ -2,12 +2,145 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"sort"
+	"strconv"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gin-gonic/gin"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
+
+func (br *bookRepository) GetBooks(c *gin.Context, f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error) {
+	var result []model.Book
+
+	sc := mysqlQB().Select("COUNT(id)").From("books pr")
+
+	qb := mysqlQB().
+		Select("pr.id", "pr.uuid", "pr.author_id", "pr.name", "pr.price", "pr.stock").
+		From("books pr")
+
+	if len(f.BookUUID) != 0 {
+		qb = qb.Where("pr.uuid LIKE ?", "%"+f.BookUUID+"%")
+		sc = sc.Where("pr.uuid LIKE ?", "%"+f.BookUUID+"%")
+	}
+
+	if f.BookID != 0 {
+		qb = qb.Where("pr.id LIKE ?", "%"+strconv.Itoa(f.BookID)+"%")
+		sc = sc.Where("pr.id LIKE ?", "%"+strconv.Itoa(f.BookID)+"%")
+	}
+
+	if f.AuthorID != 0 {
+		qb = qb.Where("pr.author_id LIKE ?", "%"+strconv.Itoa(f.AuthorID)+"%")
+		sc = sc.Where("pr.author_id LIKE ?", "%"+strconv.Itoa(f.AuthorID)+"%")
+	}
+
+	if len(f.Name) != 0 {
+		qb = qb.Where("pr.name LIKE ?", "%"+f.Name+"%")
+		sc = sc.Where("pr.name LIKE ?", "%"+f.Name+"%")
+	}
+
+	if len(strconv.Itoa(f.MinPrice)) != 1 && len(strconv.Itoa(f.MaxPrice)) == 1 {
+		fmt.Println("test1")
+		qb = qb.Where("pr.price >= ? ", strconv.Itoa(f.MinPrice))
+		sc = sc.Where("pr.price >= ? ", strconv.Itoa(f.MinPrice))
+	} else if len(strconv.Itoa(f.MinPrice)) == 1 && len(strconv.Itoa(f.MaxPrice)) != 1 {
+		fmt.Println("test2")
+		qb = qb.Where("pr.price <= ? ", strconv.Itoa(f.MaxPrice))
+		sc = sc.Where("pr.price <= ? ", strconv.Itoa(f.MaxPrice))
+	} else if len(strconv.Itoa(f.MinPrice)) != 1 && len(strconv.Itoa(f.MaxPrice)) != 1 {
+		fmt.Println("test3")
+		qb = qb.Where(squirrel.And{
+			squirrel.GtOrEq{"pr.price": f.MinPrice},
+			squirrel.LtOrEq{"pr.price": f.MaxPrice},
+		})
+		sc = sc.Where(squirrel.And{
+			squirrel.GtOrEq{"pr.price": f.MinPrice},
+			squirrel.LtOrEq{"pr.price": f.MaxPrice},
+		})
+	}
+
+	if len(strconv.Itoa(f.MinStock)) != 1 && len(strconv.Itoa(f.MaxStock)) == 1 {
+		qb = qb.Where("pr.price >= ? ", strconv.Itoa(f.MinStock))
+		sc = sc.Where("pr.price >= ? ", strconv.Itoa(f.MinStock))
+	} else if len(strconv.Itoa(f.MinStock)) == 1 && len(strconv.Itoa(f.MaxStock)) != 1 {
+		qb = qb.Where("pr.price <= ? ", strconv.Itoa(f.MaxStock))
+		sc = sc.Where("pr.price <= ? ", strconv.Itoa(f.MaxStock))
+	} else if len(strconv.Itoa(f.MinStock)) != 1 && len(strconv.Itoa(f.MaxStock)) != 1 {
+		qb = qb.Where(squirrel.And{
+			squirrel.GtOrEq{"pr.price": f.MinStock},
+			squirrel.LtOrEq{"pr.price": f.MaxStock},
+		})
+		sc = sc.Where(squirrel.And{
+			squirrel.GtOrEq{"pr.price": f.MinStock},
+			squirrel.LtOrEq{"pr.price": f.MaxStock},
+		})
+	}
+
+	qb, pag := Paginate(sc, qb, *p)
+
+	rows, err := qb.Query()
+	if err != nil {
+		log.Printf("Query rows failed: %v", err)
+		return result, pag, errors.New("something wrong happened")
+	}
+
+	for rows.Next() {
+		var r model.Book
+		if err := rows.Scan(&r.ID, &r.UUID, &r.AuthorID, &r.Name, &r.Price, &r.Stock); err != nil {
+			log.Printf("scan rows failed: %v", err)
+			return result, pag, errors.New("something wrong happened")
+		}
+
+		result = append(result, r)
+	}
+
+	if len(p.Perpage) == 0 {
+		defaultPerPage := "10"
+		pag.Perpage = &defaultPerPage
+	} else {
+		pag.Perpage = &p.Perpage
+	}
+
+	sort.SliceStable(result, func(i, j int) bool {
+		return result[i].ID > result[j].ID
+	})
+
+	var hmp bool
+	if len(result) > 0 {
+		more := sc.Where(squirrel.Lt{"id": result[len(result)-1].ID})
+		hmp = hasMorePages(more)
+	} else {
+		hmp = false
+	}
+
+	pag.HasMorePages = &hmp
+	if hmp {
+		first := curs{result[len(result)-1].ID, *pag.HasMorePages}
+		enc := encodeCursor(first)
+		pag.NextCursor = &enc
+	} else {
+		pag.NextCursor = nil
+	}
+
+	if len(result) > 0 {
+		sc = sc.Where(squirrel.Gt{"id": result[0].ID})
+		if isFirstPage(sc) {
+			pag.PrevCursor = nil
+		} else {
+			c := curs{result[0].ID, false}
+			enc := encodeCursor(c)
+			pag.PrevCursor = &enc
+		}
+	} else {
+		pag.PrevCursor = nil
+	}
+
+	return result, pag, nil
+}
 
 func (br *bookRepository) CreateBook(bm model.Book) error {
 	var err error

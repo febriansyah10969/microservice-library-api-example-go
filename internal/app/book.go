@@ -11,10 +11,40 @@ import (
 	validator "github.com/go-playground/validator/v10"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
+// func (ba *BookApp) GetListBook(c *gin.Context) {
+// 	c.JSON(http.StatusOK, "testing")
+// }
+
 func (ba *BookApp) GetListBook(c *gin.Context) {
-	c.JSON(http.StatusOK, "testing")
+	fillter := new(helper.Filter)
+
+	if err := c.BindQuery(&fillter); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar ulasan", nil, []model.Book{}, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	inPag := new(helper.InPage)
+	if err := c.ShouldBindWith(&inPag, binding.Query); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar ulasan", nil, []model.Book{}, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	result, pag, err := ba.BookService.GetBooks(c, fillter, inPag)
+	if err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar Buku", nil, []model.Book{}, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var data = []model.Book{}
+	data = result
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan daftar Buku", pag, data, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 func (ba *BookApp) CreateBook(c *gin.Context) {
