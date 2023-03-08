@@ -47,7 +47,7 @@ func (ba *BookApp) CreateBook(c *gin.Context) {
 
 	_, err := ba.BookService.CreateBook(c, req)
 	if err != nil {
-		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menambahkan ulasan", nil, nil, err.Error())
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menambahkan buku", nil, nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
