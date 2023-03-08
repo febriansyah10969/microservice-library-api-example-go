@@ -55,3 +55,14 @@ func (bs *bookService) UpdateBook(c *gin.Context, uuid dto.GetUUID, rev dto.Book
 
 	return []string{}, nil
 }
+
+func (bs *bookService) DeleteBook(uuid dto.GetUUID) error {
+
+	repo := bs.dao.NewGeneralRepository()
+	err := repo.DeleteBook(uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

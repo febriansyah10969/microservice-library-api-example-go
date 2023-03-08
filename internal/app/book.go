@@ -130,3 +130,22 @@ func (ba *BookApp) UpdateBook(c *gin.Context) {
 	response := helper.APIResponse(http.StatusOK, true, "Berhasil menambahkan buku", nil, req, nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (ba *BookApp) DeleteBook(c *gin.Context) {
+	uri := dto.GetUUID{}
+	if err := c.ShouldBindUri(&uri); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menghapus buku", nil, nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err := ba.BookService.DeleteBook(uri)
+	if err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menghapus buku", nil, nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menghapus buku", nil, nil, nil)
+	c.JSON(http.StatusOK, response)
+}
