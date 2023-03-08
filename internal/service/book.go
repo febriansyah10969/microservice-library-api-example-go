@@ -25,3 +25,22 @@ func (bs *bookService) CreateBook(c *gin.Context, rev dto.BookRequest) ([]string
 
 	return []string{}, nil
 }
+
+func (bs *bookService) UpdateBook(c *gin.Context, uuid dto.GetUUID, rev dto.BookRequest) ([]string, error) {
+	// var uri dto.GetUUID
+
+	repo := bs.dao.NewGeneralRepository()
+
+	var bookData = new(model.Book)
+
+	bookData.AuthorID = int(rev.AuthorID)
+	bookData.Name = rev.Name
+	bookData.Price = int(rev.Price)
+
+	err := repo.UpdateBook(uuid, *bookData)
+	if err != nil {
+		return []string{}, err
+	}
+
+	return []string{}, nil
+}
