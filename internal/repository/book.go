@@ -157,7 +157,7 @@ func (br *bookRepository) CreateBook(bm model.Book) error {
 }
 
 func (br *bookRepository) UpdateBook(uuid dto.GetUUID, bm model.Book) error {
-	_, err := mysqlQB().Update("books").Set("author_id", bm.AuthorID).Set("name", bm.Name).Set("price", bm.Price).Where(squirrel.Eq{"uuid": uuid}).Exec()
+	_, err := mysqlQB().Update("books").Set("author_id", bm.AuthorID).Set("name", bm.Name).Set("price", bm.Price).Where(squirrel.Eq{"uuid": uuid.UUID}).Exec()
 
 	if err != nil {
 		log.Printf("cannot update stock -> Error: %v", err)
