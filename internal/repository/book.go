@@ -168,3 +168,15 @@ func (br *bookRepository) UpdateBook(uuid dto.GetUUID, bm model.Book) error {
 
 	return nil
 }
+
+func (br *bookRepository) DeleteBook(uuid dto.GetUUID) error {
+	_, err := mysqlQB().Delete("books").Where(squirrel.Eq{"uuid": uuid.UUID}).Exec()
+	if err != nil {
+		log.Printf("cannot delete book -> Error: %v", err)
+		return errors.New("something wrong happened")
+	} else {
+		log.Printf("Success delete Books")
+	}
+
+	return nil
+}
