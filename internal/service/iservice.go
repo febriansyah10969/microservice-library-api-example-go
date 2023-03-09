@@ -13,6 +13,8 @@ type BookService interface {
 	CreateBook(c *gin.Context, rev dto.BookRequest) ([]string, error)
 	UpdateBook(c *gin.Context, uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)
 	DeleteBook(uuid dto.GetUUID) error
+
+	IncreaseStock(uri dto.GetUUID, req dto.StockRequest) error
 }
 
 type bookService struct {
