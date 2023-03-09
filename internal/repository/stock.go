@@ -71,6 +71,9 @@ func (br *bookRepository) GetBookHistory(uuid dto.GetUUID) ([]model.Book, error)
 		log.Printf("Success Show Book History")
 	}
 
+	// close rows to avoid goroutines leak
+	defer rows.Close()
+
 	books := []model.Book{}
 	for rows.Next() {
 		book := model.Book{}
