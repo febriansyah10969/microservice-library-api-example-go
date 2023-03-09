@@ -29,7 +29,7 @@ func (br *bookRepository) GetCurrentStock(uuid dto.GetUUID) (model.Book, error) 
 	return book, nil
 }
 
-func (br *bookRepository) IncreaseStock(uuid dto.GetUUID, stock int) error {
+func (br *bookRepository) UpdateStock(uuid dto.GetUUID, stock int) error {
 	_, err := mysqlQB().Update("books").Set("stock", stock).Where(squirrel.Eq{"uuid": uuid.UUID}).Exec()
 
 	if err != nil {

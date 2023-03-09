@@ -15,6 +15,7 @@ type BookService interface {
 	DeleteBook(uuid dto.GetUUID) error
 
 	IncreaseStock(uri dto.GetUUID, req dto.StockRequest) error
+	DecreaseStock(uri dto.GetUUID, req dto.StockRequest) error
 }
 
 type bookService struct {
