@@ -108,6 +108,12 @@ func (ba *BookApp) GetBookHistory(c *gin.Context) {
 		return
 	}
 
+	if len(bookResponse.UUID) == 0 {
+		response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", nil, nil, nil)
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
 	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", nil, &bookResponse, nil)
 	c.JSON(http.StatusOK, response)
 }
