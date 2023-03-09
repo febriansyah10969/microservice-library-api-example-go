@@ -15,6 +15,10 @@ type BookRepository interface {
 	CreateBook(bm model.Book) error
 	UpdateBook(uuid dto.GetUUID, bm model.Book) error
 	DeleteBook(uuid dto.GetUUID) error
+
+	GetCurrentStock(uuid dto.GetUUID) (model.Book, error)
+	IncreaseStock(uuid dto.GetUUID, stock int) error
+	CreateBookHistory(mbh model.BookHistory) error
 }
 
 type bookRepository struct {

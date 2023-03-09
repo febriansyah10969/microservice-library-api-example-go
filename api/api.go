@@ -23,6 +23,8 @@ func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 			api.POST("/book", app.CreateBook)
 			api.PUT("/book/:uuid", app.UpdateBook)
 			api.DELETE("/book/:uuid", app.DeleteBook)
+
+			api.PUT("book/stock/increase/:uuid", app.IncreaseBookStock)
 		}
 	}
 }
