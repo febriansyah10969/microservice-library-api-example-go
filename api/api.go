@@ -24,6 +24,7 @@ func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 			api.PUT("/book/:uuid", app.UpdateBook)
 			api.DELETE("/book/:uuid", app.DeleteBook)
 
+			api.GET("book/stock/history/:uuid", app.GetBookHistory)
 			api.PUT("book/stock/increase/:uuid", app.IncreaseBookStock)
 			api.PUT("book/stock/decrease/:uuid", app.DecreaseBookStock)
 		}
