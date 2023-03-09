@@ -92,3 +92,22 @@ func (ba *BookApp) DecreaseBookStock(c *gin.Context) {
 	response := helper.APIResponse(http.StatusOK, true, "Berhasil Mengurangi stok buku", nil, req, nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (ba *BookApp) GetBookHistory(c *gin.Context) {
+	uri := dto.GetUUID{}
+	if err := c.ShouldBindUri(&uri); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan history buku", nil, nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	bookResponse, errBookService := ba.BookService.GetBookHistory(uri)
+	if errBookService != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan history buku", nil, nil, errBookService.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", nil, &bookResponse, nil)
+	c.JSON(http.StatusOK, response)
+}

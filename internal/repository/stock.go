@@ -55,3 +55,36 @@ func (br *bookRepository) CreateBookHistory(mbh model.BookHistory) error {
 
 	return nil
 }
+
+func (br *bookRepository) GetBookHistory(uuid dto.GetUUID) ([]model.Book, error) {
+	rows, err := mysqlQB().
+		Select("pr.id", "pr.uuid as book_uuid", "pr.name", "pr.stock", "bh.book_id", "bh.uuid as book_id", "bh.qty", "bh.type").
+		From("books pr").
+		LeftJoin("book_histories bh on bh.book_id = pr.id").
+		Where(squirrel.Eq{"pr.uuid": uuid.UUID}).
+		Query()
+
+	if err != nil {
+		log.Printf("cannot Get Book History -> Error: %v", err)
+		return []model.Book{}, errors.New("something wrong happened")
+	} else {
+		log.Printf("Success Show Book History")
+	}
+
+	books := []model.Book{}
+	for rows.Next() {
+		book := model.Book{}
+		err = rows.Scan(&book.ID, &book.UUID, &book.Name, &book.Stock, &book.BookHistory.BookID, &book.BookHistory.UUID, &book.BookHistory.Qty, &book.BookHistory.Type)
+		if err != nil {
+			return nil, err
+		}
+
+		books = append(books, book)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return books, nil
+}
