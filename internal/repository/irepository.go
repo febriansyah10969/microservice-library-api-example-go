@@ -11,6 +11,9 @@ import (
 )
 
 type BookRepository interface {
+	GetUser(id int) (model.User, error)
+
+	GetBook(book_uuid dto.GetUUID) (model.Book, error)
 	GetBooks(c *gin.Context, f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error)
 	CreateBook(bm model.Book) error
 	UpdateBook(uuid dto.GetUUID, bm model.Book) error
@@ -20,6 +23,9 @@ type BookRepository interface {
 	GetCurrentStock(uuid dto.GetUUID) (model.Book, error)
 	UpdateStock(uuid dto.GetUUID, stock int) error
 	CreateBookHistory(mbh model.BookHistory) error
+
+	CreateUserTransaction(transaction model.Transaction) (int, error)
+	CreateBookTransaction(transaction model.BookTransaction) error
 }
 
 type bookRepository struct {

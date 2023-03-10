@@ -14,6 +14,27 @@ import (
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
+func (br *bookRepository) GetBook(book_uuid dto.GetUUID) (model.Book, error) {
+	book := model.Book{}
+
+	err := mysqlQB().
+		Select("pr.id", "pr.uuid", "pr.author_id", "pr.name", "pr.price", "pr.stock").
+		From("books pr").
+		Where(squirrel.Eq{"uuid": book_uuid.UUID}).
+		Limit(1).
+		Scan(&book.ID, &book.UUID, &book.AuthorID, &book.Name, &book.Price, &book.Stock)
+
+	if err != nil {
+		log.Printf("cannot Get book -> Error: %v", err)
+		return model.Book{}, errors.New("something wrong happened")
+	} else {
+		log.Printf("Success Get book")
+	}
+
+	return book, nil
+
+}
+
 func (br *bookRepository) GetBooks(c *gin.Context, f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error) {
 	var result []model.Book
 

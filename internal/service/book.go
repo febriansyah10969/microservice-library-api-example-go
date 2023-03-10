@@ -8,6 +8,16 @@ import (
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
+func (bs *bookService) GetBook(book_uuid dto.GetUUID) (model.Book, error) {
+	dao := bs.dao.NewGeneralRepository()
+	getBook, err := dao.GetBook(book_uuid)
+	if err != nil {
+		return model.Book{}, err
+	}
+
+	return getBook, nil
+}
+
 func (bs *bookService) GetBooks(c *gin.Context, fillter *helper.Filter, paginate *helper.InPage) ([]model.Book, *helper.Pagination, error) {
 	dao := bs.dao.NewGeneralRepository()
 	result, pag, err := dao.GetBooks(c, fillter, paginate)
