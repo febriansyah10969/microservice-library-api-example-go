@@ -23,13 +23,6 @@ func (ba *BookApp) AddToCart(c *gin.Context) {
 		return
 	}
 
-	uri := dto.GetUUID{}
-	if err := c.ShouldBindUri(&uri); err != nil {
-		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menambahkan buku ke keranjang", nil, nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
 	req := dto.TransactionRequest{}
 	if err := c.ShouldBindWith(&req, binding.Form); err != nil {
 		fmt.Println(&req) // log the error
@@ -49,6 +42,10 @@ func (ba *BookApp) AddToCart(c *gin.Context) {
 
 		c.JSON(http.StatusOK, response)
 		return
+	}
+
+	uri := dto.GetUUID{
+		UUID: req.BookUUID,
 	}
 
 	getBook, errBook := ba.BookService.GetBook(uri)

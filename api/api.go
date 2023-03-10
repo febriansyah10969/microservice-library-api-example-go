@@ -28,7 +28,7 @@ func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 			api.PUT("book/stock/increase/:uuid", app.IncreaseBookStock)
 			api.PUT("book/stock/decrease/:uuid", app.DecreaseBookStock)
 
-			api.PUT("book/transaction/add-to-cart/:uuid", app.AddToCart)
+			api.PUT("book/transaction/add-to-cart", app.AddToCart)
 		}
 	}
 }
