@@ -1,7 +1,7 @@
 package model
 
 // table name for book
-const BOOKTRANSACTION string = "transaction_books"
+const BOOKTRANSACTION string = "book_transactions"
 
 type BookTransaction struct {
 	ID     int    `db:"id"`

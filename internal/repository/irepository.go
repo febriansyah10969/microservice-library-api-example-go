@@ -26,6 +26,9 @@ type BookRepository interface {
 
 	CreateUserTransaction(transaction model.Transaction) (int, error)
 	CreateBookTransaction(transaction model.BookTransaction) error
+
+	UpdateUserTransaction(trans_id int, transaction model.Transaction) error
+	UpdateBookTransaction(trans_id int, transaction model.BookTransaction) error
 }
 
 type bookRepository struct {

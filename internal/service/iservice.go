@@ -22,6 +22,7 @@ type BookService interface {
 	DecreaseStock(uri dto.GetUUID, req dto.StockRequest) error
 
 	AddToCart(req dto.TransactionRequest, book model.Book, user model.User) error
+	OnBorrow(req dto.TransactionRequest, book model.Book, user model.User) error
 }
 
 type bookService struct {
