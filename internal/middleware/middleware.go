@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,10 +11,7 @@ import (
 )
 
 type Auth struct {
-	Uuid  string
-	Name  string
-	email string
-	phone string
+	ID int
 }
 
 func AuthHandler(auth AuthService) gin.HandlerFunc {
@@ -41,7 +39,7 @@ func AuthHandler(auth AuthService) gin.HandlerFunc {
 			return
 		}
 
-		_, ok := token.Claims.(jwt.MapClaims)
+		claim, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
 			err := gin.H{"errors": "Cannot claim token."}
 			response := helper.APIResponse(http.StatusUnauthorized, false, "Unauthorized", nil, nil, err)
@@ -49,7 +47,10 @@ func AuthHandler(auth AuthService) gin.HandlerFunc {
 			return
 		}
 
+		id, err := strconv.Atoi(claim["sub"].(string))
+
 		payload := Auth{}
+		payload.ID = id
 
 		c.Set("payload", payload)
 		c.Next()
