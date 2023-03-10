@@ -31,7 +31,7 @@ func ControlStock(bs *bookService, book_uuid dto.GetUUID, req dto.StockRequest, 
 	}
 
 	stock := 0
-	if getType == 1 {
+	if getType == 1 || getType == 4 {
 		stock = data.Stock + req.Qty
 	} else if getType == 2 || getType == 5 || getType == 6 {
 		stock = data.Stock - req.Qty
