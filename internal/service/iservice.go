@@ -17,7 +17,7 @@ type BookService interface {
 	UpdateBook(c *gin.Context, uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)
 	DeleteBook(uuid dto.GetUUID) error
 
-	GetBookHistory(uri dto.GetUUID) (dto.BookHistoryResponse, error)
+	GetBookHistory(uri dto.GetUUID, p *helper.InPage) ([]dto.BookHistoriesResponse, *helper.Pagination, error)
 	IncreaseStock(uri dto.GetUUID, req dto.StockRequest) error
 	DecreaseStock(uri dto.GetUUID, req dto.StockRequest) error
 

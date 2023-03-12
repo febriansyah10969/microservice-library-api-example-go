@@ -3,9 +3,11 @@ package repository
 import (
 	"errors"
 	"log"
+	"sort"
 
 	"github.com/Masterminds/squirrel"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
@@ -56,38 +58,81 @@ func (br *bookRepository) CreateBookHistory(mbh model.BookHistory) error {
 	return nil
 }
 
-func (br *bookRepository) GetBookHistory(uuid dto.GetUUID) ([]model.Book, error) {
-	rows, err := mysqlQB().
-		Select("pr.id", "pr.uuid as book_uuid", "pr.name", "pr.stock", "bh.book_id", "bh.uuid as book_id", "bh.qty", "bh.type").
-		From("books pr").
-		LeftJoin("book_histories bh on bh.book_id = pr.id").
-		Where(squirrel.Eq{"pr.uuid": uuid.UUID}).
-		Query()
+func (br *bookRepository) GetBookHistory(uuid dto.GetUUID, p *helper.InPage) ([]model.BookHistory, *helper.Pagination, error) {
+	bookHistories := []model.BookHistory{}
 
+	sc := mysqlQB().
+		Select("COUNT(pr.id)").
+		From("book_histories pr").
+		LeftJoin("books bh on bh.id = pr.book_id").
+		Where(squirrel.Eq{"pr.uuid": uuid.UUID})
+
+	qb := mysqlQB().
+		Select("pr.id", "pr.uuid", "pr.qty", "pr.type").
+		From("book_histories pr").
+		LeftJoin("books b on b.id = pr.book_id").
+		Where(squirrel.Eq{"b.uuid": uuid.UUID})
+
+	qb, pag := Paginate(sc, qb, *p)
+
+	rows, err := qb.Query()
 	if err != nil {
-		log.Printf("cannot Get Book History -> Error: %v", err)
-		return []model.Book{}, errors.New("something wrong happened")
-	} else {
-		log.Printf("Success Show Book History")
+		log.Printf("Query rows failed: %v", err)
+		return bookHistories, pag, errors.New("something wrong happened")
 	}
 
-	// close rows to avoid goroutines leak
-	defer rows.Close()
-
-	books := []model.Book{}
 	for rows.Next() {
-		book := model.Book{}
-		err = rows.Scan(&book.ID, &book.UUID, &book.Name, &book.Stock, &book.BookHistory.BookID, &book.BookHistory.UUID, &book.BookHistory.Qty, &book.BookHistory.Type)
-		if err != nil {
-			return nil, err
+		bookHistory := model.BookHistory{}
+		if err := rows.Scan(&bookHistory.BookID, &bookHistory.UUID, &bookHistory.Qty, &bookHistory.Type); err != nil {
+			log.Printf("scan rows failed: %v", err)
+			return bookHistories, pag, errors.New("something wrong happened")
 		}
 
-		books = append(books, book)
+		bookHistories = append(bookHistories, bookHistory)
 	}
 
-	if err = rows.Err(); err != nil {
-		return nil, err
+	defer rows.Close()
+
+	if len(p.Perpage) == 0 {
+		defaultPerPage := "10"
+		pag.Perpage = &defaultPerPage
+	} else {
+		pag.Perpage = &p.Perpage
 	}
 
-	return books, nil
+	sort.SliceStable(bookHistories, func(i, j int) bool {
+		return bookHistories[i].ID > bookHistories[j].ID
+	})
+
+	var hmp bool
+	if len(bookHistories) > 0 {
+		more := sc.Where(squirrel.Lt{"id": bookHistories[len(bookHistories)-1].ID})
+		hmp = hasMorePages(more)
+	} else {
+		hmp = false
+	}
+
+	pag.HasMorePages = &hmp
+	if hmp {
+		first := curs{bookHistories[len(bookHistories)-1].ID, *pag.HasMorePages}
+		enc := encodeCursor(first)
+		pag.NextCursor = &enc
+	} else {
+		pag.NextCursor = nil
+	}
+
+	if len(bookHistories) > 0 {
+		sc = sc.Where(squirrel.Gt{"id": bookHistories[0].ID})
+		if isFirstPage(sc) {
+			pag.PrevCursor = nil
+		} else {
+			c := curs{bookHistories[0].ID, false}
+			enc := encodeCursor(c)
+			pag.PrevCursor = &enc
+		}
+	} else {
+		pag.PrevCursor = nil
+	}
+
+	return bookHistories, pag, nil
 }

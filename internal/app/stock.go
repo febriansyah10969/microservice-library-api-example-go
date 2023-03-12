@@ -101,19 +101,26 @@ func (ba *BookApp) GetBookHistory(c *gin.Context) {
 		return
 	}
 
-	bookResponse, errBookService := ba.BookService.GetBookHistory(uri)
+	inPag := new(helper.InPage)
+	if err := c.ShouldBindWith(&inPag, binding.Query); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar ulasan", nil, []dto.BookResponse{}, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	bookHistories, pag, errBookService := ba.BookService.GetBookHistory(uri, inPag)
 	if errBookService != nil {
 		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan history buku", nil, nil, errBookService.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	if len(bookResponse.UUID) == 0 {
-		response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", nil, nil, nil)
+	if len(bookHistories) == 0 {
+		response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", pag, nil, nil)
 		c.JSON(http.StatusOK, response)
 		return
 	}
 
-	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", nil, &bookResponse, nil)
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan history buku", pag, &bookHistories, nil)
 	c.JSON(http.StatusOK, response)
 }
