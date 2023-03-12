@@ -2,39 +2,33 @@ package service
 
 import (
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 )
 
-func (bs *bookService) GetBookHistory(uri dto.GetUUID) (dto.BookHistoryResponse, error) {
+func (bs *bookService) GetBookHistory(uri dto.GetUUID, p *helper.InPage) ([]dto.BookHistoriesResponse, *helper.Pagination, error) {
 	dao := bs.dao.NewGeneralRepository()
 
-	data, err := dao.GetBookHistory(uri)
+	data, pag, err := dao.GetBookHistory(uri, p)
 
 	if err != nil {
-		return dto.BookHistoryResponse{}, err
+		return []dto.BookHistoriesResponse{}, pag, err
 	}
 
-	getBook := dto.BookHistoryResponse{}
-	getBookHistories := []dto.BookHistories{}
+	getBookHistories := []dto.BookHistoriesResponse{}
 
 	for _, book := range data {
-		getBook.UUID = book.UUID
-		getBook.Name = book.Name
-		getBook.Stock = book.Stock
-
-		bookHistory := dto.BookHistories{
-			UUID:   book.BookHistory.UUID,
-			BookID: book.BookHistory.BookID,
-			Qty:    book.BookHistory.Qty,
-			Type:   book.BookHistory.Type,
+		bookHistory := dto.BookHistoriesResponse{
+			UUID:   book.UUID,
+			BookID: book.BookID,
+			Qty:    book.Qty,
+			Type:   book.Type,
 		}
 
 		getBookHistories = append(getBookHistories, bookHistory)
 
 	}
 
-	getBook.BookHistories = getBookHistories
-
-	return getBook, nil
+	return getBookHistories, pag, nil
 }
 
 func (bs *bookService) IncreaseStock(uri dto.GetUUID, req dto.StockRequest) error {
