@@ -23,6 +23,7 @@ type BookService interface {
 
 	AddToCart(req dto.TransactionRequest, book model.Book, user model.User) error
 	OnBorrow(req dto.TransactionRequest, book model.Book, user model.User) error
+	Finish(req dto.TransactionFinishRequest) error
 }
 
 type bookService struct {

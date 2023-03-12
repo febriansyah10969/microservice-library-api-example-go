@@ -30,7 +30,7 @@ func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 
 			api.POST("book/transaction/add-to-cart", app.AddToCart)
 			api.POST("book/transaction/on-borrow", app.OnBorrow)
-
+			api.POST("book/transaction/finish", app.Finish)
 		}
 	}
 }
