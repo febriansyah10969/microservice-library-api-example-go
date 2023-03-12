@@ -24,6 +24,8 @@ type BookRepository interface {
 	UpdateStock(uuid dto.GetUUID, stock int) error
 	CreateBookHistory(mbh model.BookHistory) error
 
+	GetTransaction(string) (model.Transaction, error)
+
 	CreateUserTransaction(transaction model.Transaction) (int, error)
 	CreateBookTransaction(transaction model.BookTransaction) error
 

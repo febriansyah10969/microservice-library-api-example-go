@@ -68,7 +68,7 @@ func (bs *bookService) OnBorrow(req dto.TransactionRequest, book model.Book, use
 	book_uuid := dto.GetUUID{UUID: book.UUID}
 	book_qty := dto.StockRequest{Qty: req.Qty}
 
-	if req.TransID == 0 {
+	if len(req.TransID) == 0 {
 		transaction := model.Transaction{}
 
 		transaction.UUID = uuid.NewString()
@@ -93,23 +93,35 @@ func (bs *bookService) OnBorrow(req dto.TransactionRequest, book model.Book, use
 
 		dao.CreateBookTransaction(bookTransaction)
 	} else {
+		getTransaction, errGetUserTransaction := dao.GetTransaction(req.TransID)
+		if errGetUserTransaction != nil {
+			println("tet")
+			return errGetUserTransaction
+		}
+
 		transaction := model.Transaction{}
 
 		transaction.Days = req.Days
 		transaction.Status = 2 // on Borrow
 
-		errCreateUserTransaction := dao.UpdateUserTransaction(req.TransID, transaction)
+		errCreateUserTransaction := dao.UpdateUserTransaction(getTransaction.ID, transaction)
 		if errCreateUserTransaction != nil {
+			println("tet")
 			return errCreateUserTransaction
 		}
 
 		bookTransaction := model.BookTransaction{}
 		bookTransaction.Qty = req.Qty
 
-		dao.UpdateBookTransaction(req.TransID, bookTransaction)
+		errUpdateBookTransaction := dao.UpdateBookTransaction(getTransaction.ID, bookTransaction)
+		if errUpdateBookTransaction != nil {
+			println("tess")
+			return errUpdateBookTransaction
+		}
 
 		errIncreaseStock := ControlStock(bs, book_uuid, book_qty, 4)
 		if errIncreaseStock != nil {
+			println("tes")
 			return errIncreaseStock
 		}
 	}
