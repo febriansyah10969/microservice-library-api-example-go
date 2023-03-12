@@ -13,6 +13,7 @@ import (
 type BookRepository interface {
 	GetUser(id int) (model.User, error)
 
+	GetBookByID(id int) (model.Book, error)
 	GetBook(book_uuid dto.GetUUID) (model.Book, error)
 	GetBooks(c *gin.Context, f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error)
 	CreateBook(bm model.Book) error

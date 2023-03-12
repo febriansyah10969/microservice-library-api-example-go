@@ -6,3 +6,7 @@ type TransactionRequest struct {
 	Qty      int    `form:"qty" json:"qty" binding:"required"`
 	Days     int    `form:"days" json:"days" binding:"required"`
 }
+
+type TransactionFinishRequest struct {
+	TransUUID string `form:"transaction_id" json:"transaction_id"`
+}

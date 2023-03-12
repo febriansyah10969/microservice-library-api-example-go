@@ -133,3 +133,39 @@ func (bs *bookService) OnBorrow(req dto.TransactionRequest, book model.Book, use
 
 	return nil
 }
+
+func (bs *bookService) Finish(req dto.TransactionFinishRequest) error {
+	dao := bs.dao.NewGeneralRepository()
+
+	getTransaction, errGetUserTransaction := dao.GetTransaction(req.TransUUID)
+	if errGetUserTransaction != nil {
+		println("tet")
+		return errGetUserTransaction
+	}
+
+	getBook, errGetUserTransaction := dao.GetBookByID(getTransaction.BookTransaction.BookID)
+	if errGetUserTransaction != nil {
+		println("tet")
+		return errGetUserTransaction
+	}
+
+	transaction := model.Transaction{}
+	transaction.Status = 3 // on Borrow
+
+	errCreateUserTransaction := dao.UpdateUserTransaction(getTransaction.ID, transaction)
+	if errCreateUserTransaction != nil {
+		println("tet")
+		return errCreateUserTransaction
+	}
+
+	book_uuid := dto.GetUUID{UUID: getBook.UUID}
+	book_qty := dto.StockRequest{Qty: getTransaction.BookTransaction.Qty}
+
+	errIncreaseStock := ControlStock(bs, book_uuid, book_qty, 3)
+	if errIncreaseStock != nil {
+		println("tes")
+		return errIncreaseStock
+	}
+
+	return nil
+}
