@@ -8,6 +8,26 @@ import (
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
+func (br *bookRepository) GetTransaction(trans_id string) (model.Transaction, error) {
+	transaction := model.Transaction{}
+
+	err := mysqlQB().
+		Select("id").
+		From("transactions").
+		Where(squirrel.Eq{"uuid": trans_id}).
+		Limit(1).
+		Scan(&transaction.ID)
+
+	if err != nil {
+		log.Printf("failed to get data transactions table triggered by void service -> %v", err)
+		return model.Transaction{}, errors.New("something wrong happened")
+	} else {
+		log.Println("success Get User Transaction")
+	}
+
+	return transaction, nil
+}
+
 func (br *bookRepository) CreateUserTransaction(transaction model.Transaction) (int, error) {
 
 	row, err := mysqlQB().Insert("transactions").Columns("uuid", "code_trx", "user_id", "days", "status", "final_price").
@@ -58,9 +78,9 @@ func (br *bookRepository) UpdateUserTransaction(trans_id int, transaction model.
 
 func (br *bookRepository) UpdateBookTransaction(trans_id int, transaction model.BookTransaction) error {
 	_, err := mysqlQB().
-		Update("transactions").
+		Update("book_transactions").
 		Set("qty", transaction.Qty).
-		Where(squirrel.Eq{"id": trans_id}).
+		Where(squirrel.Eq{"trx_id": trans_id}).
 		Exec()
 
 	if err != nil {
