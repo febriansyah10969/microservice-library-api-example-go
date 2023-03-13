@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
@@ -143,6 +145,18 @@ func (bs *bookService) Finish(req dto.TransactionUUIDRequest) error {
 		return errGetUserTransaction
 	}
 
+	if getTransaction.Status == 1 {
+		return errors.New("Barang masih dalam keranjang")
+	}
+
+	if getTransaction.Status == 3 {
+		return errors.New("Buku sudah selesai dipinjam")
+	}
+
+	if getTransaction.Status == 4 {
+		return errors.New("Buku sudah dikembalikan.")
+	}
+
 	getBook, errGetUserTransaction := dao.GetBookByID(getTransaction.BookTransaction.BookID)
 	if errGetUserTransaction != nil {
 		println("tet")
@@ -177,6 +191,18 @@ func (bs *bookService) Cancel(req dto.TransactionUUIDRequest) error {
 	if errGetUserTransaction != nil {
 		println("tet1")
 		return errGetUserTransaction
+	}
+
+	if getTransaction.Status == 2 {
+		return errors.New("Buku sedang dipinjam tidak dapat di kembalikan.")
+	}
+
+	if getTransaction.Status == 3 {
+		return errors.New("Buku sudah selesai dipinjam")
+	}
+
+	if getTransaction.Status == 4 {
+		return errors.New("Buku sudah dikembalikan.")
 	}
 
 	getBook, errGetUserTransaction := dao.GetBookByID(getTransaction.BookTransaction.BookID)

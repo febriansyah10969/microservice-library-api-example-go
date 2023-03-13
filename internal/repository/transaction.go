@@ -12,12 +12,12 @@ func (br *bookRepository) GetTransaction(trans_id string) (model.Transaction, er
 	transaction := model.Transaction{}
 
 	err := mysqlQB().
-		Select("transactions.id", "book_transactions.book_id", "book_transactions.qty").
+		Select("transactions.id", "transaction.status", "book_transactions.book_id", "book_transactions.qty").
 		From("transactions").
 		LeftJoin("book_transactions on book_transactions.trx_id=transactions.id").
 		Where(squirrel.Eq{"transactions.uuid": trans_id}).
 		Limit(1).
-		Scan(&transaction.ID, &transaction.BookTransaction.BookID, &transaction.BookTransaction.Qty)
+		Scan(&transaction.ID, &transaction.Status, &transaction.BookTransaction.BookID, &transaction.BookTransaction.Qty)
 
 	if err != nil {
 		log.Printf("failed to get data transactions table triggered by void service -> %v", err)
