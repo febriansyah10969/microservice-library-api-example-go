@@ -134,7 +134,7 @@ func (bs *bookService) OnBorrow(req dto.TransactionRequest, book model.Book, use
 	return nil
 }
 
-func (bs *bookService) Finish(req dto.TransactionFinishRequest) error {
+func (bs *bookService) Finish(req dto.TransactionUUIDRequest) error {
 	dao := bs.dao.NewGeneralRepository()
 
 	getTransaction, errGetUserTransaction := dao.GetTransaction(req.TransUUID)
@@ -162,6 +162,42 @@ func (bs *bookService) Finish(req dto.TransactionFinishRequest) error {
 	book_qty := dto.StockRequest{Qty: getTransaction.BookTransaction.Qty}
 
 	errIncreaseStock := ControlStock(bs, book_uuid, book_qty, 3)
+	if errIncreaseStock != nil {
+		println("tes")
+		return errIncreaseStock
+	}
+
+	return nil
+}
+
+func (bs *bookService) Cancel(req dto.TransactionUUIDRequest) error {
+	dao := bs.dao.NewGeneralRepository()
+
+	getTransaction, errGetUserTransaction := dao.GetTransaction(req.TransUUID)
+	if errGetUserTransaction != nil {
+		println("tet1")
+		return errGetUserTransaction
+	}
+
+	getBook, errGetUserTransaction := dao.GetBookByID(getTransaction.BookTransaction.BookID)
+	if errGetUserTransaction != nil {
+		println("tet2")
+		return errGetUserTransaction
+	}
+
+	transaction := model.Transaction{}
+	transaction.Status = 4 // CANCEL
+
+	errCreateUserTransaction := dao.UpdateUserTransaction(getTransaction.ID, transaction)
+	if errCreateUserTransaction != nil {
+		println("tet3")
+		return errCreateUserTransaction
+	}
+
+	book_uuid := dto.GetUUID{UUID: getBook.UUID}
+	book_qty := dto.StockRequest{Qty: getTransaction.BookTransaction.Qty}
+
+	errIncreaseStock := ControlStock(bs, book_uuid, book_qty, 4)
 	if errIncreaseStock != nil {
 		println("tes")
 		return errIncreaseStock
