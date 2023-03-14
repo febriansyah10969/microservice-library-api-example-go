@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gin-gonic/gin"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
@@ -54,7 +53,7 @@ func (br *bookRepository) GetBookByID(id int) (model.Book, error) {
 	return book, nil
 }
 
-func (br *bookRepository) GetBooks(c *gin.Context, f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error) {
+func (br *bookRepository) GetBooks(f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error) {
 	var result []model.Book
 
 	sc := mysqlQB().Select("COUNT(id)").From("books pr")

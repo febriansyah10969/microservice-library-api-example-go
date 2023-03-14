@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
@@ -18,17 +17,30 @@ func (bs *bookService) GetBook(book_uuid dto.GetUUID) (model.Book, error) {
 	return getBook, nil
 }
 
-func (bs *bookService) GetBooks(c *gin.Context, fillter *helper.Filter, paginate *helper.InPage) ([]model.Book, *helper.Pagination, error) {
+func (bs *bookService) GetBooks(fillter *helper.Filter, paginate *helper.InPage) ([]dto.BookResponse, *helper.Pagination, error) {
+	data := []dto.BookResponse{}
+
 	dao := bs.dao.NewGeneralRepository()
-	result, pag, err := dao.GetBooks(c, fillter, paginate)
+	result, pag, err := dao.GetBooks(fillter, paginate)
 	if err != nil {
-		return result, pag, err
+		return data, pag, err
 	}
 
-	return result, pag, nil
+	for _, book := range result {
+		response := dto.BookResponse{
+			UUID:     book.UUID,
+			AuthorID: book.AuthorID,
+			Name:     book.Name,
+			Price:    book.Price,
+		}
+
+		data = append(data, response)
+	}
+
+	return data, pag, nil
 }
 
-func (bs *bookService) CreateBook(c *gin.Context, rev dto.BookRequest) ([]string, error) {
+func (bs *bookService) CreateBook(rev dto.BookRequest) ([]string, error) {
 	repo := bs.dao.NewGeneralRepository()
 
 	var bookData = new(model.Book)
@@ -47,7 +59,7 @@ func (bs *bookService) CreateBook(c *gin.Context, rev dto.BookRequest) ([]string
 	return []string{}, nil
 }
 
-func (bs *bookService) UpdateBook(c *gin.Context, uuid dto.GetUUID, rev dto.BookRequest) ([]string, error) {
+func (bs *bookService) UpdateBook(uuid dto.GetUUID, rev dto.BookRequest) ([]string, error) {
 	// var uri dto.GetUUID
 
 	repo := bs.dao.NewGeneralRepository()

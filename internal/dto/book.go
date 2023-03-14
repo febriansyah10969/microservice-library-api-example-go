@@ -16,3 +16,17 @@ type BookResponse struct {
 	Name     string `json:"name"`
 	Price    int    `json:"price"`
 }
+
+type BookTransform struct {
+	UUID         string `json:"uuid"`
+	AuthorID     int    `json:"author_id"`
+	Name         string `json:"name"`
+	Price        int    `json:"price"`
+	Stock        int    `json:"stock"`
+	ParentID     string `json:"parent_id"`
+	SubID        string `json:"sub_id"`
+	ChildSubID   string `json:"child_sub_id"`
+	ParentName   string `json:"parent_name"`
+	SubName      string `json:"sub_name"`
+	ChildSubName string `json:"child_sub_name"`
+}

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
@@ -12,9 +11,9 @@ type BookService interface {
 	GetUser(id int) (model.User, error)
 
 	GetBook(book_uuid dto.GetUUID) (model.Book, error)
-	GetBooks(c *gin.Context, fillter *helper.Filter, paginate *helper.InPage) ([]model.Book, *helper.Pagination, error)
-	CreateBook(c *gin.Context, rev dto.BookRequest) ([]string, error)
-	UpdateBook(c *gin.Context, uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)
+	GetBooks(fillter *helper.Filter, paginate *helper.InPage) ([]dto.BookResponse, *helper.Pagination, error)
+	CreateBook(rev dto.BookRequest) ([]string, error)
+	UpdateBook(uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)
 	DeleteBook(uuid dto.GetUUID) error
 
 	GetBookHistory(uri dto.GetUUID, p *helper.InPage) ([]dto.BookHistoriesResponse, *helper.Pagination, error)

@@ -33,25 +33,14 @@ func (ba *BookApp) GetListBook(c *gin.Context) {
 		return
 	}
 
-	result, pag, err := ba.BookService.GetBooks(c, fillter, inPag)
+	result, pag, err := ba.BookService.GetBooks(fillter, inPag)
 	if err != nil {
 		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar Buku", nil, []dto.BookResponse{}, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	data := []dto.BookResponse{}
-	for _, book := range result {
-		response := dto.BookResponse{
-			UUID:     book.UUID,
-			AuthorID: book.AuthorID,
-			Name:     book.Name,
-			Price:    book.Price,
-		}
-
-		data = append(data, response)
-	}
-	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan daftar Buku", pag, data, nil)
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan daftar Buku", pag, result, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -83,7 +72,7 @@ func (ba *BookApp) CreateBook(c *gin.Context) {
 		return
 	}
 
-	_, err := ba.BookService.CreateBook(c, req)
+	_, err := ba.BookService.CreateBook(req)
 	if err != nil {
 		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menambahkan buku", nil, nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -128,7 +117,7 @@ func (ba *BookApp) UpdateBook(c *gin.Context) {
 		return
 	}
 
-	_, err := ba.BookService.UpdateBook(c, uri, req)
+	_, err := ba.BookService.UpdateBook(uri, req)
 	if err != nil {
 		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menambahkan buku", nil, nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
