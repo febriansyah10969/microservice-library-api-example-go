@@ -19,6 +19,8 @@ type BookRepository interface {
 	UpdateBook(uuid dto.GetUUID, bm model.Book) error
 	DeleteBook(uuid dto.GetUUID) error
 
+	CategoryDetail(getCategoryID dto.GetCategoryID) (model.Category, error)
+
 	GetBookHistory(uuid dto.GetUUID, p *helper.InPage) ([]model.BookHistory, *helper.Pagination, error)
 	GetCurrentStock(uuid dto.GetUUID) (model.Book, error)
 	UpdateStock(uuid dto.GetUUID, stock int) error

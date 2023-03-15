@@ -19,9 +19,9 @@ type BookResponse struct {
 }
 
 type BookCategoriesResponse struct {
-	ID       int    `json:"id"`
-	ParentID *int   `json:"parent_id"`
-	Name     string `json:"name"`
+	ID       *int    `json:"id"`
+	ParentID *int    `json:"parent_id"`
+	Name     *string `json:"name"`
 }
 
 type BookTransform struct {
