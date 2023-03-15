@@ -11,11 +11,11 @@ type BookRequest struct {
 }
 
 type BookResponse struct {
-	UUID     string `json:"uuid"`
-	AuthorID int    `json:"author_id"`
-	Name     string `json:"name"`
-	Price    int    `json:"price"`
-	Category []BookCategoriesResponse
+	UUID     string                   `json:"uuid"`
+	AuthorID int                      `json:"author_id"`
+	Name     string                   `json:"name"`
+	Price    int                      `json:"price"`
+	Category []BookCategoriesResponse `json:"categories"`
 }
 
 type BookCategoriesResponse struct {
