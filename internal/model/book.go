@@ -15,6 +15,7 @@ type Book struct {
 }
 
 type Category struct {
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID         int    `db:"id"`
+	CategoryID *int   `db:"category_id"`
+	Name       string `db:"name"`
 }

@@ -135,7 +135,7 @@ func (br *bookRepository) GetBooks(f *helper.Filter, p *helper.InPage) ([]model.
 		}
 
 		qbCategory := mysqlQB().
-			Select("c.id, c.name").
+			Select("c.id, c.category_id, c.name").
 			From("book_categories bc").
 			LeftJoin("categories as c ON c.id=bc.category_id").
 			Where("bc.book_id = ? ", &r.ID)
@@ -148,7 +148,7 @@ func (br *bookRepository) GetBooks(f *helper.Filter, p *helper.InPage) ([]model.
 
 		for rowsCategory.Next() {
 			cat := model.Category{}
-			if err := rowsCategory.Scan(&cat.ID, &cat.Name); err != nil {
+			if err := rowsCategory.Scan(&cat.ID, &cat.CategoryID, &cat.Name); err != nil {
 				log.Printf("scan rows failed: %v", err)
 				return result, pag, errors.New("something wrong happened")
 			}
