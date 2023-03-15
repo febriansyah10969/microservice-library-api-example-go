@@ -79,7 +79,7 @@ func (ba *BookApp) CreateBook(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse(http.StatusOK, true, "Berhasil menambahkan buku", nil, req, nil)
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menambahkan buku", nil, nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
