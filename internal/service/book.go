@@ -34,6 +34,15 @@ func (bs *bookService) GetBooks(fillter *helper.Filter, paginate *helper.InPage)
 			Price:    book.Price,
 		}
 
+		for _, category := range book.Category {
+			catResponse := dto.BookCategoriesResponse{
+				ID:   category.ID,
+				Name: category.Name,
+			}
+
+			response.Category = append(response.Category, catResponse)
+		}
+
 		data = append(data, response)
 	}
 

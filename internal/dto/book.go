@@ -15,6 +15,12 @@ type BookResponse struct {
 	AuthorID int    `json:"author_id"`
 	Name     string `json:"name"`
 	Price    int    `json:"price"`
+	Category []BookCategoriesResponse
+}
+
+type BookCategoriesResponse struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type BookTransform struct {

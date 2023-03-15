@@ -128,12 +128,32 @@ func (br *bookRepository) GetBooks(f *helper.Filter, p *helper.InPage) ([]model.
 	}
 
 	for rows.Next() {
-		var r model.Book
+		r := model.Book{}
 		if err := rows.Scan(&r.ID, &r.UUID, &r.AuthorID, &r.Name, &r.Price, &r.Stock); err != nil {
 			log.Printf("scan rows failed: %v", err)
 			return result, pag, errors.New("something wrong happened")
 		}
 
+		qbCategory := mysqlQB().
+			Select("c.id, c.name").
+			From("book_categories bc").
+			LeftJoin("categories as c ON c.id=bc.category_id").
+			Where("bc.book_id = ? ", &r.ID)
+
+		rowsCategory, err := qbCategory.Query()
+		if err != nil {
+			log.Printf("Query rows Category failed: %v", err)
+			return result, pag, errors.New("something wrong happened")
+		}
+
+		for rowsCategory.Next() {
+			cat := model.Category{}
+			if err := rowsCategory.Scan(&cat.ID, &cat.Name); err != nil {
+				log.Printf("scan rows failed: %v", err)
+				return result, pag, errors.New("something wrong happened")
+			}
+			r.Category = append(r.Category, cat)
+		}
 		result = append(result, r)
 	}
 

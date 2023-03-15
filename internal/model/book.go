@@ -11,4 +11,10 @@ type Book struct {
 	Price       int    `db:"price"`
 	Stock       int    `db:"stock"`
 	BookHistory BookHistory
+	Category    []Category
+}
+
+type Category struct {
+	ID   int    `db:"id"`
+	Name string `db:"name"`
 }
