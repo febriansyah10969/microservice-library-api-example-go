@@ -21,26 +21,46 @@ func (ba *BookApp) GetListBook(c *gin.Context) {
 	fillter := new(helper.Filter)
 
 	if err := c.BindQuery(&fillter); err != nil {
-		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar ulasan", nil, []dto.BookResponse{}, err.Error())
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar buku", nil, []dto.BookResponse{}, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	inPag := new(helper.InPage)
 	if err := c.ShouldBindWith(&inPag, binding.Query); err != nil {
-		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar ulasan", nil, []dto.BookResponse{}, err.Error())
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar buku", nil, []dto.BookResponse{}, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	result, pag, err := ba.BookService.GetBooks(fillter, inPag)
 	if err != nil {
-		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan daftar Buku", nil, []dto.BookResponse{}, err.Error())
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagalmenampilkan daftar buku", nil, []dto.BookResponse{}, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan daftar Buku", pag, result, nil)
+	c.JSON(http.StatusOK, response)
+}
+
+func (ba *BookApp) GetBookDetail(c *gin.Context) {
+	bookUUID := dto.BookUUID{}
+	if err := c.ShouldBindUri(&bookUUID); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal Menambah buku", nil, nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	result, err := ba.BookService.GetBookDetail(bookUUID)
+
+	if err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan rincian buku", nil, nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan rincian Buku", nil, result, nil)
 	c.JSON(http.StatusOK, response)
 }
 

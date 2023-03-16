@@ -14,6 +14,7 @@ type BookRepository interface {
 
 	GetBookByID(id int) (model.Book, error)
 	GetBook(book_uuid dto.GetUUID) (model.Book, error)
+	GetBookDetail(book_uuid dto.BookUUID) (model.Book, error)
 	GetBooks(f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error)
 	CreateBook(bm model.Book) error
 	UpdateBook(uuid dto.GetUUID, bm model.Book) error

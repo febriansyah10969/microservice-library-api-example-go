@@ -53,6 +53,38 @@ func (br *bookRepository) GetBookByID(id int) (model.Book, error) {
 	return book, nil
 }
 
+func (br *bookRepository) GetBookDetail(book_uuid dto.BookUUID) (model.Book, error) {
+	result := model.Book{}
+
+	mysqlQB().
+		Select("pr.id", "pr.uuid", "pr.author_id", "pr.name", "pr.price", "pr.stock").
+		From("books pr").
+		Scan(&result.ID, &result.UUID, &result.AuthorID, &result.Name, &result.Price, &result.Stock)
+
+	qbCategory := mysqlQB().
+		Select("c.id, c.category_id, c.name").
+		From("book_categories bc").
+		LeftJoin("categories as c ON c.id=bc.category_id").
+		Where("bc.book_id = ? ", &result.ID)
+
+	rowsCategory, err := qbCategory.Query()
+	if err != nil {
+		log.Printf("Query rows Category failed: %v", err)
+		return result, errors.New("something wrong happened")
+	}
+
+	for rowsCategory.Next() {
+		cat := model.Category{}
+		if err := rowsCategory.Scan(&cat.ID, &cat.CategoryID, &cat.Name); err != nil {
+			log.Printf("scan rows failed: %v", err)
+			return result, errors.New("something wrong happened")
+		}
+		result.Category = append(result.Category, cat)
+	}
+
+	return result, nil
+}
+
 func (br *bookRepository) GetBooks(f *helper.Filter, p *helper.InPage) ([]model.Book, *helper.Pagination, error) {
 	var result []model.Book
 

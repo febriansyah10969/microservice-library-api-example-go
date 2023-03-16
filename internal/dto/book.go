@@ -4,6 +4,10 @@ type GetUUID struct {
 	UUID string `uri:"uuid" binding:"required"`
 }
 
+type BookUUID struct {
+	UUID string `uri:"uuid" binding:"required"`
+}
+
 type BookRequest struct {
 	AuthorID int    `form:"author_id" json:"author_id" binding:"required"`
 	Name     string `form:"name" json:"name" binding:"required,min=3"`
@@ -15,13 +19,15 @@ type BookResponse struct {
 	AuthorID int                      `json:"author_id"`
 	Name     string                   `json:"name"`
 	Price    int                      `json:"price"`
+	Stock    int                      `json:"stock"`
 	Category []BookCategoriesResponse `json:"categories"`
 }
 
 type BookCategoriesResponse struct {
-	ID       *int    `json:"id"`
-	ParentID *int    `json:"parent_id"`
-	Name     *string `json:"name"`
+	ID       *int                     `json:"id"`
+	ParentID *int                     `json:"parent_id"`
+	Name     *string                  `json:"name"`
+	Detail   []CategoryDetailResponse `json:"category_detail"`
 }
 
 type BookTransform struct {

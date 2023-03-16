@@ -22,6 +22,7 @@ func RegisterRoutes(r *gin.Engine, app app.BookApp) {
 			api.GET("/category/detail/:id", app.GetCategoryDetail)
 
 			api.GET("/book", app.GetListBook)
+			api.GET("/book/detail/:uuid", app.GetBookDetail)
 			api.POST("/book", app.CreateBook)
 			api.PUT("/book/:uuid", app.UpdateBook)
 			api.DELETE("/book/:uuid", app.DeleteBook)

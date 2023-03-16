@@ -11,6 +11,7 @@ type BookService interface {
 	GetUser(id int) (model.User, error)
 
 	GetBook(book_uuid dto.GetUUID) (model.Book, error)
+	GetBookDetail(book_uuid dto.BookUUID) (dto.BookResponse, error)
 	GetBooks(filter *helper.Filter, paginate *helper.InPage) ([]dto.BookResponse, *helper.Pagination, error)
 	CreateBook(rev dto.BookRequest) ([]string, error)
 	UpdateBook(uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)

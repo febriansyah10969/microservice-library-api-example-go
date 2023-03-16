@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strconv"
+
 	"github.com/google/uuid"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
@@ -32,6 +34,7 @@ func (bs *bookService) GetBooks(fillter *helper.Filter, paginate *helper.InPage)
 			AuthorID: book.AuthorID,
 			Name:     book.Name,
 			Price:    book.Price,
+			Stock:    book.Stock,
 		}
 
 		for _, category := range book.Category {
@@ -41,6 +44,14 @@ func (bs *bookService) GetBooks(fillter *helper.Filter, paginate *helper.InPage)
 				Name:     category.Name,
 			}
 
+			// categoryID := dto.GetCategoryID{CategoryID: strconv.Itoa(*category.ID)}
+			// categoryDetail, errCategoryDetail := GetCategoryDetail(bs, categoryID)
+			// if errCategoryDetail != nil {
+			// 	return data, pag, errCategoryDetail
+			// }
+
+			// catResponse.Detail = categoryDetail
+
 			response.Category = append(response.Category, catResponse)
 		}
 
@@ -48,6 +59,44 @@ func (bs *bookService) GetBooks(fillter *helper.Filter, paginate *helper.InPage)
 	}
 
 	return data, pag, nil
+}
+
+func (bs *bookService) GetBookDetail(book_uuid dto.BookUUID) (dto.BookResponse, error) {
+	data := dto.BookResponse{}
+
+	dao := bs.dao.NewGeneralRepository()
+
+	book, err := dao.GetBookDetail(book_uuid)
+	if err != nil {
+		return data, err
+	}
+
+	response := dto.BookResponse{
+		UUID:     book.UUID,
+		AuthorID: book.AuthorID,
+		Name:     book.Name,
+		Price:    book.Price,
+	}
+
+	for _, category := range book.Category {
+		catResponse := dto.BookCategoriesResponse{
+			ID:       category.ID,
+			ParentID: category.CategoryID,
+			Name:     category.Name,
+		}
+
+		categoryID := dto.GetCategoryID{CategoryID: strconv.Itoa(*category.ID)}
+		categoryDetail, errCategoryDetail := GetCategoryDetail(bs, categoryID)
+		if errCategoryDetail != nil {
+			return data, errCategoryDetail
+		}
+
+		catResponse.Detail = categoryDetail
+
+		response.Category = append(response.Category, catResponse)
+	}
+
+	return response, nil
 }
 
 func (bs *bookService) CreateBook(rev dto.BookRequest) ([]string, error) {
