@@ -10,3 +10,13 @@ type TransactionRequest struct {
 type TransactionUUIDRequest struct {
 	TransUUID string `form:"transaction_id" json:"transaction_id" binding:"required"`
 }
+
+type TransactionResponse struct {
+	UUID       string `json:"uuid"`
+	CodeTrx    string `json:"code_trx"`
+	Days       int    `json:"days"`
+	Status     int    `json:"status"`
+	FinalPrice int    `json:"final_price"`
+	BookID     *int   `json:"book_uuid"`
+	Qty        *int   `json:"qty"`
+}

@@ -3,10 +3,90 @@ package repository
 import (
 	"errors"
 	"log"
+	"sort"
+	"strconv"
 
 	"github.com/Masterminds/squirrel"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
+
+func (br *bookRepository) GetTransactions(f *helper.Filter, p *helper.InPage) ([]model.Transaction, *helper.Pagination, error) {
+	transactions := []model.Transaction{}
+
+	sc := mysqlQB().Select("COUNT(id)").From("transactions")
+
+	qb := mysqlQB().
+		Select("pr.uuid", "pr.code_trx", "pr.days", "pr.status", "pr.final_price", "book_transactions.book_id", "book_transactions.qty").
+		From("transactions pr").
+		LeftJoin("book_transactions on book_transactions.trx_id=pr.id")
+
+	qb, pag := Paginate(sc, qb, *p)
+
+	rows, err := qb.Query()
+
+	if err != nil {
+		log.Printf("Query Transactions rows failed: %v", err)
+		return transactions, pag, errors.New("something wrong happened")
+	} else {
+		log.Println("success Get Transactions")
+	}
+
+	for rows.Next() {
+		transaction := model.Transaction{}
+		if err := rows.Scan(&transaction.UUID, &transaction.CodeTrx, &transaction.Days, &transaction.Status, &transaction.FinalPrice, &transaction.PartialBookTransaction.BookID, &transaction.PartialBookTransaction.Qty); err != nil {
+			log.Printf("scan rows failed: %v", err)
+			return transactions, nil, errors.New("something wrong happened")
+		} else {
+			log.Println("Berhasil mendapatkan data transaksi : " + strconv.Itoa(len(transactions)))
+		}
+
+		transactions = append(transactions, transaction)
+	}
+
+	if len(p.Perpage) == 0 {
+		defaultPerPage := "10"
+		pag.Perpage = &defaultPerPage
+	} else {
+		pag.Perpage = &p.Perpage
+	}
+
+	sort.SliceStable(transactions, func(i, j int) bool {
+		return transactions[i].ID > transactions[j].ID
+	})
+
+	var hmp bool
+	if len(transactions) > 0 {
+		more := sc.Where(squirrel.Lt{"id": transactions[len(transactions)-1].ID})
+		hmp = hasMorePages(more)
+	} else {
+		hmp = false
+	}
+
+	pag.HasMorePages = &hmp
+	if hmp {
+		first := curs{transactions[len(transactions)-1].ID, *pag.HasMorePages}
+		enc := encodeCursor(first)
+		pag.NextCursor = &enc
+	} else {
+		pag.NextCursor = nil
+	}
+
+	if len(transactions) > 0 {
+		sc = sc.Where(squirrel.Gt{"id": transactions[0].ID})
+		if isFirstPage(sc) {
+			pag.PrevCursor = nil
+		} else {
+			c := curs{transactions[0].ID, false}
+			enc := encodeCursor(c)
+			pag.PrevCursor = &enc
+		}
+	} else {
+		pag.PrevCursor = nil
+	}
+
+	return transactions, pag, nil
+}
 
 func (br *bookRepository) GetTransaction(trans_id string) (model.Transaction, error) {
 	transaction := model.Transaction{}

@@ -11,3 +11,8 @@ type BookTransaction struct {
 	Qty    int    `db:"qty"`
 	Price  int    `db:"price"`
 }
+
+type PartialBookTransaction struct {
+	BookID *int `db:"book_id"`
+	Qty    *int `db:"qty"`
+}

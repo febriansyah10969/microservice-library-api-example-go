@@ -14,6 +14,33 @@ import (
 	"gitlab.com/p9359/backend-prob/febry-go/internal/middleware"
 )
 
+func (ba *BookApp) GetTransactions(c *gin.Context) {
+	fillter := new(helper.Filter)
+
+	if err := c.BindQuery(&fillter); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan transaksi", nil, []dto.BookResponse{}, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	inPag := new(helper.InPage)
+	if err := c.ShouldBindWith(&inPag, binding.Query); err != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan transaksi", nil, []dto.BookResponse{}, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	transactions, pag, errGetTransactions := ba.BookService.GetTransactions(fillter, inPag)
+	if errGetTransactions != nil {
+		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan transaksi", nil, nil, errGetTransactions.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse(http.StatusOK, true, "Berhasil menampilkan transaksi", pag, transactions, nil)
+	c.JSON(http.StatusOK, response)
+}
+
 func (ba *BookApp) AddToCart(c *gin.Context) {
 	payload := c.MustGet("payload").(middleware.Auth)
 	getUser, errUserService := ba.BookService.GetUser(payload.ID)

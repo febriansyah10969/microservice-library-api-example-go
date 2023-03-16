@@ -11,10 +11,12 @@ type BookService interface {
 	GetUser(id int) (model.User, error)
 
 	GetBook(book_uuid dto.GetUUID) (model.Book, error)
-	GetBooks(fillter *helper.Filter, paginate *helper.InPage) ([]dto.BookResponse, *helper.Pagination, error)
+	GetBooks(filter *helper.Filter, paginate *helper.InPage) ([]dto.BookResponse, *helper.Pagination, error)
 	CreateBook(rev dto.BookRequest) ([]string, error)
 	UpdateBook(uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)
 	DeleteBook(uuid dto.GetUUID) error
+
+	GetTransactions(filter *helper.Filter, paginate *helper.InPage) ([]dto.TransactionResponse, *helper.Pagination, error)
 
 	CategoryDetail(categoryID dto.GetCategoryID) ([]dto.CategoryDetailResponse, error)
 

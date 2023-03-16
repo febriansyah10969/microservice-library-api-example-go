@@ -2,11 +2,36 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/dto"
+	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
+
+func (bs *bookService) GetTransactions(filter *helper.Filter, paginate *helper.InPage) ([]dto.TransactionResponse, *helper.Pagination, error) {
+	transactions := []dto.TransactionResponse{}
+
+	dao := bs.dao.NewGeneralRepository()
+	getTransactions, pag, err := dao.GetTransactions(filter, paginate)
+	fmt.Println(getTransactions)
+	for _, getTransaction := range getTransactions {
+		transaction := dto.TransactionResponse{
+			UUID:       getTransaction.UUID,
+			CodeTrx:    getTransaction.CodeTrx,
+			Days:       getTransaction.Days,
+			Status:     getTransaction.Status,
+			FinalPrice: getTransaction.FinalPrice,
+			BookID:     getTransaction.PartialBookTransaction.BookID,
+			Qty:        getTransaction.PartialBookTransaction.Qty,
+		}
+
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, pag, err
+}
 
 func (bs *bookService) AddToCart(req dto.TransactionRequest, book model.Book, user model.User) error {
 	dao := bs.dao.NewGeneralRepository()
