@@ -10,7 +10,7 @@ import (
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
-func (bs *bookService) GetTransactions(filter *helper.Filter, paginate *helper.InPage) ([]dto.TransactionResponse, *helper.Pagination, error) {
+func (bs *bookService) GetTransactions(filter *helper.TrxFilter, paginate *helper.InPage) ([]dto.TransactionResponse, *helper.Pagination, error) {
 	transactions := []dto.TransactionResponse{}
 
 	dao := bs.dao.NewGeneralRepository()

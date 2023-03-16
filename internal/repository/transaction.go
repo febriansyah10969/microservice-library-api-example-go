@@ -2,24 +2,30 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"sort"
-	"strconv"
 
 	"github.com/Masterminds/squirrel"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/helper"
 	"gitlab.com/p9359/backend-prob/febry-go/internal/model"
 )
 
-func (br *bookRepository) GetTransactions(f *helper.Filter, p *helper.InPage) ([]model.Transaction, *helper.Pagination, error) {
+func (br *bookRepository) GetTransactions(f *helper.TrxFilter, p *helper.InPage) ([]model.Transaction, *helper.Pagination, error) {
 	transactions := []model.Transaction{}
 
-	sc := mysqlQB().Select("COUNT(id)").From("transactions")
+	sc := mysqlQB().Select("COUNT(pr.id)").From("transactions pr")
 
 	qb := mysqlQB().
 		Select("pr.uuid", "pr.code_trx", "pr.days", "pr.status", "pr.final_price", "book_transactions.book_id", "book_transactions.qty").
 		From("transactions pr").
 		LeftJoin("book_transactions on book_transactions.trx_id=pr.id")
+
+	fmt.Println(f.TrxID)
+	if len(f.TrxID) != 0 {
+		sc = sc.Where("pr.code_trx LIKE ?", "%"+f.TrxID+"%")
+		qb = qb.Where("pr.code_trx LIKE ?", "%"+f.TrxID+"%")
+	}
 
 	qb, pag := Paginate(sc, qb, *p)
 
@@ -37,8 +43,6 @@ func (br *bookRepository) GetTransactions(f *helper.Filter, p *helper.InPage) ([
 		if err := rows.Scan(&transaction.UUID, &transaction.CodeTrx, &transaction.Days, &transaction.Status, &transaction.FinalPrice, &transaction.PartialBookTransaction.BookID, &transaction.PartialBookTransaction.Qty); err != nil {
 			log.Printf("scan rows failed: %v", err)
 			return transactions, nil, errors.New("something wrong happened")
-		} else {
-			log.Println("Berhasil mendapatkan data transaksi : " + strconv.Itoa(len(transactions)))
 		}
 
 		transactions = append(transactions, transaction)

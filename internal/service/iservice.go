@@ -16,7 +16,7 @@ type BookService interface {
 	UpdateBook(uuid dto.GetUUID, rev dto.BookRequest) ([]string, error)
 	DeleteBook(uuid dto.GetUUID) error
 
-	GetTransactions(filter *helper.Filter, paginate *helper.InPage) ([]dto.TransactionResponse, *helper.Pagination, error)
+	GetTransactions(filter *helper.TrxFilter, paginate *helper.InPage) ([]dto.TransactionResponse, *helper.Pagination, error)
 
 	CategoryDetail(categoryID dto.GetCategoryID) ([]dto.CategoryDetailResponse, error)
 

@@ -27,7 +27,7 @@ type BookRepository interface {
 	CreateBookHistory(mbh model.BookHistory) error
 
 	GetTransaction(string) (model.Transaction, error)
-	GetTransactions(f *helper.Filter, p *helper.InPage) ([]model.Transaction, *helper.Pagination, error)
+	GetTransactions(f *helper.TrxFilter, p *helper.InPage) ([]model.Transaction, *helper.Pagination, error)
 
 	CreateUserTransaction(transaction model.Transaction) (int, error)
 	CreateBookTransaction(transaction model.BookTransaction) error

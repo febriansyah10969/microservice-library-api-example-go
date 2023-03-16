@@ -11,6 +11,10 @@ type Filter struct {
 	MaxStock int    `form:"max_stock"`
 }
 
+type TrxFilter struct {
+	TrxID string `form:"trx_id"`
+}
+
 type Timezone struct {
 	CurrentTime string `form:"makasi-timenow"`
 	GMT         int    `form:"makasi-timezone"`

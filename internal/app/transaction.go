@@ -15,9 +15,9 @@ import (
 )
 
 func (ba *BookApp) GetTransactions(c *gin.Context) {
-	fillter := new(helper.Filter)
+	filter := new(helper.TrxFilter)
 
-	if err := c.BindQuery(&fillter); err != nil {
+	if err := c.BindQuery(&filter); err != nil {
 		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan transaksi", nil, []dto.BookResponse{}, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
@@ -30,7 +30,7 @@ func (ba *BookApp) GetTransactions(c *gin.Context) {
 		return
 	}
 
-	transactions, pag, errGetTransactions := ba.BookService.GetTransactions(fillter, inPag)
+	transactions, pag, errGetTransactions := ba.BookService.GetTransactions(filter, inPag)
 	if errGetTransactions != nil {
 		response := helper.APIResponse(http.StatusBadRequest, false, "Gagal menampilkan transaksi", nil, nil, errGetTransactions.Error())
 		c.JSON(http.StatusBadRequest, response)
